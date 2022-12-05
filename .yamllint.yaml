@@ -1,0 +1,18 @@
+---
+extends: default
+ignore:
+  - .venv
+
+# Compatibility with yaml-language-server and extra rules
+rules:
+  comments:
+    min-spaces-from-content: 1
+  line-length:
+    allow-non-breakable-inline-mappings: true
+  empty-values: enable
+  octal-values:
+    forbid-implicit-octal: true
+  quoted-strings:
+    required: only-when-needed
+    quote-type: double
+    allow-quoted-quotes: true
