@@ -9,7 +9,6 @@
   "python.linting.banditArgs": ["--ini", "setup.cfg"],
   "python.linting.pylintCategorySeverity.refactor": "Warning",
   "python.linting.pylintCategorySeverity.convention": "Warning",
-  "cSpell.words": ["aiohttp", "Pickler", "udemy", "Udemy", "Unpickler"],
   "isort.importStrategy": "fromEnvironment",
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"

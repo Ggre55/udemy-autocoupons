@@ -1,0 +1,29 @@
+---
+$schema: https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json
+version: "0.2"
+dictionaries:
+  - python
+words:
+  - aiohttp
+  - bungcip
+  - datetimez
+  - davidanson
+  - dlint
+  - esbenp
+  - fstring
+  - pickler
+  - pylance
+  - pyright
+  - pyupgrade
+  - tamasfe
+  - tryceratops
+  - udemy
+  - unpickler
+  - wemake
+  - yapf
+ignorePaths:
+  - typings
+  - .git
+enableGlobDot: true
+allowCompoundWords: true
+useGitignore: true
