@@ -11,6 +11,7 @@ words:
   - dlint
   - esbenp
   - fstring
+  - kolkata
   - pickler
   - pylance
   - pyright

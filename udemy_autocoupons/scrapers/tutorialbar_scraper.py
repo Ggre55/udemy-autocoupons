@@ -1,8 +1,10 @@
 """This module contains the TutorialbarScraper scraper."""
 import asyncio
 from asyncio import Queue as AsyncQueue
+from datetime import datetime, timedelta
 from logging import getLogger
 from typing import TypedDict
+from zoneinfo import ZoneInfo
 
 from aiohttp import ClientSession
 
@@ -39,6 +41,7 @@ class TutorialbarScraper(Scraper):
     _BASE = 'https://www.tutorialbar.com/wp-json/wp/v2/posts?per_page=100&context=embed&order=asc'
     _CODE_OK = 200
     _MAX_ATTEMPTS = 5
+    _DEFAULT_DAYS = 15
 
     def __init__(
         self,
@@ -56,8 +59,14 @@ class TutorialbarScraper(Scraper):
         """
         self._queue = queue
         self._client = client
-        self._persistent_data = persistent_data
-        _debug.debug('Loaded persistent data %s', persistent_data)
+
+        default_last_date = datetime.now(
+            ZoneInfo('Asia/Kolkata'),  # Server timezone
+        ) - timedelta(days=self._DEFAULT_DAYS)
+        self._persistent_data = persistent_data or {
+            'last_date': default_last_date.strftime('%Y-%m-%dT%H:%M:%S'),
+        }
+        _debug.debug('Got persistent data %s', persistent_data)
 
         self._new_last_date: str | None = None
 
