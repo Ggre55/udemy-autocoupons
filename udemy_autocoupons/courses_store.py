@@ -54,17 +54,17 @@ class CoursesStore(MutableSet):
         Is such that eval(repr(courses_store))==courses_store.
 
         """
-        repr_ = 'CoursesStore('
+        repr_ = "CoursesStore("
 
         if self._specific_coupon:
             specific_repr = repr(self._specific_coupon)[1:-1]
-            repr_ += f'{specific_repr}, '
+            repr_ += f"{specific_repr}, "
 
         if self._any_coupon:
             any_coupon_set = set(self._any_coupon.values())
             repr_ += repr(any_coupon_set)[1:-1]
 
-        repr_ += ')'
+        repr_ += ")"
 
         return repr_
 
@@ -109,8 +109,7 @@ class CoursesStore(MutableSet):
         """
         self.optimize()
         return tuple(self._any_coupon.keys()) + tuple(
-            astuple(specific_coupon)
-            for specific_coupon in self._specific_coupon
+            astuple(specific_coupon) for specific_coupon in self._specific_coupon
         )
 
     def load_compressed(

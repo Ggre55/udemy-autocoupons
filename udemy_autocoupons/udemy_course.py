@@ -7,7 +7,7 @@ from logging import getLogger
 from typing import Literal, TypeGuard, overload
 from urllib.parse import parse_qs, urlparse
 
-_debug = getLogger('debug')
+_debug = getLogger("debug")
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,6 +22,7 @@ class _UdemyCourse(ABC):
         coupon: The discount coupon.
 
     """
+
     url_id: str
     coupon: str | None
     any_coupon: bool
@@ -34,10 +35,10 @@ class _UdemyCourse(ABC):
             The URL.
 
         """
-        url = f'https://www.udemy.com/course/{self.url_id}/'
+        url = f"https://www.udemy.com/course/{self.url_id}/"
 
         if self.coupon:
-            url += f'?couponCode={self.coupon}'
+            url += f"?couponCode={self.coupon}"
 
         return url
 
@@ -74,18 +75,18 @@ class _UdemyCourse(ABC):
         query_params = parse_qs(parsed.query, strict_parsing=True)
 
         if not _UdemyCourse.verify(parsed.netloc, parsed.path):
-            _debug.debug('%s cannot be parsed as a Udemy course', url)
+            _debug.debug("%s cannot be parsed as a Udemy course", url)
             return None
 
         # 0 is '', 1 is 'course', 2 is the url_id
-        url_id = parsed.path.split('/')[2]
+        url_id = parsed.path.split("/")[2]
 
         if any_coupon:
             return CourseWithAnyCoupon(url_id)
 
         coupon = None
 
-        if coupon_query_param := query_params.get('couponCode'):
+        if coupon_query_param := query_params.get("couponCode"):
             coupon = coupon_query_param[0]
 
         return CourseWithCoupon(url_id, coupon)
@@ -103,12 +104,11 @@ class _UdemyCourse(ABC):
             otherwise.
 
         """
-        is_udemy = netloc in {'udemy.com', 'www.udemy.com'}
+        is_udemy = netloc in {"udemy.com", "www.udemy.com"}
 
         # Avoid using regex
         has_course_url_id = (
-            path.startswith('/course/') and
-            len(path) > 8  # len('/course/') == 8
+            path.startswith("/course/") and len(path) > 8  # len('/course/') == 8
         )
 
         return is_udemy and has_course_url_id
@@ -121,6 +121,7 @@ class CourseWithAnyCoupon(_UdemyCourse):
     In this subclass, coupon is always None.
 
     """
+
     coupon: None = field(default=None, repr=False)
     any_coupon: Literal[True] = field(default=True, repr=False)
 
@@ -133,6 +134,7 @@ class CourseWithCoupon(_UdemyCourse):
     without any coupon.
 
     """
+
     coupon: str | None
     any_coupon: Literal[False] = field(default=False, repr=False)
 

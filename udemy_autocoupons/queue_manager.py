@@ -7,7 +7,7 @@ from multiprocessing import JoinableQueue as MpQueue
 
 from udemy_autocoupons.udemy_course import CourseWithCoupon
 
-_debug = getLogger('debug')
+_debug = getLogger("debug")
 
 
 class QueueManager:
@@ -30,7 +30,9 @@ class QueueManager:
 
     def __init__(self) -> None:
         """Creates a queue and stores it in the queue attribute."""
-        self.mp_queue: MpQueue[CourseWithCoupon | None] = MpQueue()  # pylint: disable=unsubscriptable-object
+        self.mp_queue: MpQueue[  # pylint: disable=unsubscriptable-object
+            CourseWithCoupon | None
+        ] = MpQueue()
         self.async_queue: AsyncQueue[str | None] = AsyncQueue()
 
         self._seen: set[CourseWithCoupon] = set()
@@ -38,30 +40,33 @@ class QueueManager:
 
     async def __aenter__(
         self,
-    ) -> tuple[AsyncQueue[str | None], MpQueue[CourseWithCoupon | None]]:  # pylint: disable=unsubscriptable-object
+    ) -> tuple[
+        AsyncQueue[str | None],
+        MpQueue[CourseWithCoupon | None],  # pylint: disable=unsubscriptable-object
+    ]:
         """Gets the queues.
 
         Returns:
             A tuple containing the async and multiprocessing queues.
 
         """
-        _debug.debug('Entered QueueManager context manager')
+        _debug.debug("Entered QueueManager context manager")
         return (self.async_queue, self.mp_queue)
 
     async def __aexit__(self, *_) -> None:
         """Closes and waits the async and multiprocessing queue."""
         await self.async_queue.put(None)
-        _debug.debug('Waiting async queue')
+        _debug.debug("Waiting async queue")
         await self.async_queue.join()
 
-        _debug.debug('Waiting _process_courses task')
+        _debug.debug("Waiting _process_courses task")
         await self._task
 
         self.mp_queue.put(None)
-        _debug.debug('Waiting multiprocessing queue')
+        _debug.debug("Waiting multiprocessing queue")
         self.mp_queue.join()
 
-        _debug.debug('Exiting QueueManager context manager')
+        _debug.debug("Exiting QueueManager context manager")
 
     async def _process_courses(self) -> None:
         while url := await self.async_queue.get():
@@ -69,8 +74,8 @@ class QueueManager:
                 if course not in self._seen:
                     self.mp_queue.put(course)
                 else:
-                    _debug.debug('Ignoring duplicate course %s', course)
+                    _debug.debug("Ignoring duplicate course %s", course)
             self.async_queue.task_done()
 
-        _debug.debug('Got None in async queue')
+        _debug.debug("Got None in async queue")
         self.async_queue.task_done()

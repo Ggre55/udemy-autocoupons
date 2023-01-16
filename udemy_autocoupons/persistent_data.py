@@ -8,8 +8,8 @@ from typing import Any
 
 from udemy_autocoupons.scrapers import ScrapersT
 
-scrapers_path = Path.cwd() / 'data' / 'scrapers.pickle'
-_debug = getLogger('debug')
+scrapers_path = Path.cwd() / "data" / "scrapers.pickle"
+_debug = getLogger("debug")
 
 
 def save_scrapers_data(scrapers: ScrapersT) -> None:
@@ -28,9 +28,9 @@ def save_scrapers_data(scrapers: ScrapersT) -> None:
         for scraper in scrapers
     }
 
-    _debug.debug('Saving %s', scrapers_data)
+    _debug.debug("Saving %s", scrapers_data)
 
-    with scrapers_path.open('wb') as pickle_file:
+    with scrapers_path.open("wb") as pickle_file:
         pickler = Pickler(pickle_file, 4)
 
         pickler.dump(scrapers_data)
@@ -45,15 +45,15 @@ def load_scrapers_data() -> defaultdict[str, Any]:
 
     """
     if not scrapers_path.is_file():
-        _debug.debug('No file found in %s', scrapers_path)
+        _debug.debug("No file found in %s", scrapers_path)
 
         return defaultdict(lambda: None)
 
-    with scrapers_path.open('rb') as pickle_file:
+    with scrapers_path.open("rb") as pickle_file:
         pickler = Unpickler(pickle_file)
         previous_persistent_data = pickler.load()
 
-        _debug.debug('Loaded %s', previous_persistent_data)
+        _debug.debug("Loaded %s", previous_persistent_data)
 
         return defaultdict(lambda: None, previous_persistent_data)
 

@@ -47,19 +47,19 @@ def setup_loggers() -> None:
     """Sets up the printer and debug loggers."""
     printer_handler = StreamHandler(stdout)
     create_logger(
-        'printer',
+        "printer",
         INFO,
         printer_handler,
-        '%(asctime)s: %(message)s',
-        '%H:%M:%S',
+        "%(asctime)s: %(message)s",
+        "%H:%M:%S",
     )
 
-    debug_handler = FileHandler('log.log')
+    debug_handler = FileHandler("log.log")
     debug = create_logger(
-        'debug',
+        "debug",
         DEBUG,
         debug_handler,
-        '%(asctime)s %(levelname)s from %(filename)s %(funcName)s in %(processName)s - %(message)s',
+        "%(asctime)s %(levelname)s from %(filename)s %(funcName)s in %(processName)s - %(message)s",
     )
 
-    debug.debug('Loggers configured')
+    debug.debug("Loggers configured")

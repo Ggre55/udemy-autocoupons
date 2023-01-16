@@ -22,7 +22,6 @@ words:
   - undetectability
   - unpickler
   - wemake
-  - yapf
 ignorePaths:
   - typings
   - .git

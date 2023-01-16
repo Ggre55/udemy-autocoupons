@@ -18,6 +18,7 @@ class _PersistentData(TypedDict):
     that can later be used as an API argument.
 
     """
+
     last_date: str
 
 
@@ -30,15 +31,16 @@ class _PostT(TypedDict):
     acf: _AcfT
 
 
-_printer = getLogger('printer')
-_debug = getLogger('debug')
+_printer = getLogger("printer")
+_debug = getLogger("debug")
 
 
 class TutorialbarScraper(Scraper):
     """Handles tutorialbar.com scraping."""
+
     _WAIT = 1
     _LONG_WAIT = 5
-    _BASE = 'https://www.tutorialbar.com/wp-json/wp/v2/posts?per_page=100&context=embed&order=asc'
+    _BASE = "https://www.tutorialbar.com/wp-json/wp/v2/posts?per_page=100&context=embed&order=asc"
     _CODE_OK = 200
     _MAX_ATTEMPTS = 5
     _DEFAULT_DAYS = 15
@@ -61,36 +63,36 @@ class TutorialbarScraper(Scraper):
         self._client = client
 
         default_last_date = datetime.now(
-            ZoneInfo('Asia/Kolkata'),  # Server timezone
+            ZoneInfo("Asia/Kolkata"),  # Server timezone
         ) - timedelta(days=self._DEFAULT_DAYS)
         self._persistent_data = persistent_data or {
-            'last_date': default_last_date.strftime('%Y-%m-%dT%H:%M:%S'),
+            "last_date": default_last_date.strftime("%Y-%m-%dT%H:%M:%S"),
         }
-        _debug.debug('Got persistent data %s', persistent_data)
+        _debug.debug("Got persistent data %s", persistent_data)
 
         self._new_last_date: str | None = None
 
     async def scrap(self) -> None:
         """Starts scraping urls and sending them to the queue manager."""
-        _debug.debug('Start scraping')
+        _debug.debug("Start scraping")
         offset = 0
 
         while urls := await self._request(self._generate_url(offset)):
-            _printer.info('Tutorialbar Scraper: Got %s course urls.', len(urls))
-            _debug.debug('Sending %s urls to async queue', len(urls))
+            _printer.info("Tutorialbar Scraper: Got %s course urls.", len(urls))
+            _debug.debug("Sending %s urls to async queue", len(urls))
 
             await self._enqueue_urls(urls)
 
             if len(urls) != 100:
                 _debug.debug(
-                    'Stopping scraper because only %s urls were received',
+                    "Stopping scraper because only %s urls were received",
                     len(urls),
                 )
                 break
 
             await asyncio.sleep(self._WAIT)
             offset += 100
-        _debug.debug('Finishing scraper, last urls value was %s', urls)
+        _debug.debug("Finishing scraper, last urls value was %s", urls)
 
     def create_persistent_data(self) -> _PersistentData | None:
         """Returns the publish date of most recent URL.
@@ -102,14 +104,14 @@ class TutorialbarScraper(Scraper):
         """
         if self._new_last_date:
             persistent_data: _PersistentData = {
-                'last_date': self._new_last_date,
+                "last_date": self._new_last_date,
             }
-            _debug.debug('Returning new persistent data %s', persistent_data)
+            _debug.debug("Returning new persistent data %s", persistent_data)
 
             return persistent_data
 
         _debug.debug(
-            'Returning old persistent data %s',
+            "Returning old persistent data %s",
             self._persistent_data,
         )
 
@@ -136,7 +138,7 @@ class TutorialbarScraper(Scraper):
             async with self._client.get(url) as res:
                 if res.status != self._CODE_OK:
                     _debug.debug(
-                        'Got code %s from %s. attempts == %s. Reattempting in %s',
+                        "Got code %s from %s. attempts == %s. Reattempting in %s",
                         res.status,
                         url,
                         attempts,
@@ -150,41 +152,41 @@ class TutorialbarScraper(Scraper):
                 json_res: list[_PostT] = await res.json()
 
             if json_res:
-                self._new_last_date = json_res[-1]['date']
+                self._new_last_date = json_res[-1]["date"]
                 _debug.debug(
-                    'Reassigning self._new_last_date to %s',
+                    "Reassigning self._new_last_date to %s",
                     self._new_last_date,
                 )
 
             urls = None
 
             try:
-                urls = [post['acf']['course_url'] for post in json_res]
+                urls = [post["acf"]["course_url"] for post in json_res]
             except (KeyError, TypeError):
                 _debug.exception(
-                    'JSON response does not follow the expected format. Response was %s',
+                    "JSON response does not follow the expected format. Response was %s",
                     json_res,
                 )
                 _printer.error(
-                    'ERROR extracting course urls from tutorialbar. Check logs.',
+                    "ERROR extracting course urls from tutorialbar. Check logs.",
                 )
 
             return urls
 
     async def _enqueue_urls(self, urls: list[str]) -> None:
         for url in urls:
-            if 'udemy' in url:
+            if "udemy" in url:
                 await self._queue.put(url)
             else:
-                _debug.debug('%s is not a udemy url', url)
+                _debug.debug("%s is not a udemy url", url)
 
     def _generate_url(self, offset: int) -> str:
-        url = f'{self._BASE}&offset={offset}'
+        url = f"{self._BASE}&offset={offset}"
 
         if self._persistent_data:
-            after = self._persistent_data['last_date']
-            url += f'&after={after}'
+            after = self._persistent_data["last_date"]
+            url += f"&after={after}"
 
-        _debug.debug('Sending request to %s', url)
+        _debug.debug("Sending request to %s", url)
 
         return url

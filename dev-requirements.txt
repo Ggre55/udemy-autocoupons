@@ -75,7 +75,7 @@ flake8-pep585 # Use classes from the standard library
 flake8-future-annotations # Import future annotations when they could be used
 
 # Formatting
-yapf
+black
 isort
 
 # Other tools

@@ -6,7 +6,7 @@ from typing import Generic, TypeVar
 
 from aiohttp import ClientSession
 
-_PersistentT = TypeVar('_PersistentT')
+_PersistentT = TypeVar("_PersistentT")
 
 
 class Scraper(ABC, Generic[_PersistentT]):

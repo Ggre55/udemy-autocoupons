@@ -10,12 +10,13 @@ from udemy_autocoupons.enroller.state import DoneOrErrorT, State
 from udemy_autocoupons.enroller.udemy_driver import UdemyDriver
 from udemy_autocoupons.udemy_course import CourseWithCoupon
 
-_printer = getLogger('printer')
-_debug = getLogger('debug')
+_printer = getLogger("printer")
+_debug = getLogger("debug")
 
 
 class RunResult(NamedTuple):
     """The result of the enroll_from_queue run."""
+
     blacklist: CoursesStore
     errors: set[CourseWithCoupon]
 
@@ -63,20 +64,20 @@ class Enroller:
         while course := self._mp_queue.get():
             self._handle_enroll(course)
             _printer.info(
-                'Enroller: Approximately %s courses left.',
+                "Enroller: Approximately %s courses left.",
                 self._mp_queue.qsize() - 1,
             )
             self._mp_queue.task_done()
 
-        _debug.debug('Got None in multiprocessing queue')
+        _debug.debug("Got None in multiprocessing queue")
         self._mp_queue.task_done()
 
         while self._reattempt_queue:
             course = self._reattempt_queue.popleft()
 
-            _debug.debug('Reattempting %s', course)
+            _debug.debug("Reattempting %s", course)
             _printer.info(
-                'Enroller: Reattempting courses up to %s times. %s enqueued',
+                "Enroller: Reattempting courses up to %s times. %s enqueued",
                 self._MAX_REATTEMPTS,
                 len(self._reattempt_queue),
             )
@@ -87,24 +88,24 @@ class Enroller:
             self._blacklist,
             self._errors,
         )
-        _debug.debug('Run result was %s', run_result)
+        _debug.debug("Run result was %s", run_result)
 
-        _debug.debug('Enrolled in %s courses', self._enrolled_counter)
-        _printer.info('Enrolled in %s courses', self._enrolled_counter)
+        _debug.debug("Enrolled in %s courses", self._enrolled_counter)
+        _printer.info("Enrolled in %s courses", self._enrolled_counter)
 
         return run_result
 
     def _handle_enroll(self, course: CourseWithCoupon) -> None:
         if course in self._blacklist:
-            _debug.debug('%s is blacklisted', course)
+            _debug.debug("%s is blacklisted", course)
         else:
             state = self._driver.enroll(course)
             self._handle_state(course, state)
 
-            _debug.debug('Enroll finished for %s', course)
+            _debug.debug("Enroll finished for %s", course)
 
         _debug.debug(
-            'mp qsize is %s, reattempt queue size is %s',
+            "mp qsize is %s, reattempt queue size is %s",
             self._mp_queue.qsize(),
             len(self._reattempt_queue),
         )
