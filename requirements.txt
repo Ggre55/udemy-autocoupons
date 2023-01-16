@@ -1,6 +1,6 @@
 # To enroll
-selenium
-undetected-chromedriver
+selenium==4.7.2
+undetected-chromedriver==3.2.1
 
 # To scrap
-aiohttp[speedups]
+aiohttp[speedups]==3.8.3
