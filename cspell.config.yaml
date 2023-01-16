@@ -11,11 +11,16 @@ words:
   - dlint
   - esbenp
   - fstring
+  - gemnasium
+  - ggshield
   - kolkata
   - pickler
   - pylance
+  - pypa
   - pyright
+  - pyup
   - pyupgrade
+  - skjold
   - tamasfe
   - tryceratops
   - udemy

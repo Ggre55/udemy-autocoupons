@@ -1,0 +1,125 @@
+---
+default_language_version:
+  python: python3.11
+
+repos:
+  # Modify files
+  ## YAML
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.7.1
+    hooks:
+      - id: prettier
+        types: [yaml]
+
+  ## Markdown
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.33.0
+    hooks:
+      - id: markdownlint-fix
+        args: [--dot]
+
+  ## INI
+  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.5.0
+    hooks:
+      - id: pretty-format-ini
+        args: [--autofix]
+
+  ## Python
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.3.1
+    hooks:
+      - id: pyupgrade
+        args: [--py311-plus]
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.11.4
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/psf/black
+    rev: 22.12.0
+    hooks:
+      - id: black
+        args: [--config, .black.toml]
+        exclude: typings
+
+  ## All
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: typings
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # Checks
+  ## YAML
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.29.0
+    hooks:
+      - id: yamllint
+        args: [--strict]
+
+  ## YAML, JSON
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.20.0
+    hooks:
+      - id: check-metaschema
+
+  ## TOML
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-toml
+
+  ## Python
+  - repo: https://github.com/PyCQA/pylint
+    rev: v2.15.10
+    hooks:
+      - id: pylint
+        additional_dependencies:
+          - selenium
+          - undetected-chromedriver
+          - aiohttp[speedups]
+
+  - repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.2.3
+    hooks:
+      - id: pydocstyle
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.4
+    hooks:
+      - id: bandit
+        args: [--ini, setup.cfg]
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.289
+    hooks:
+      - id: pyright
+
+  - repo: https://github.com/twu/skjold
+    rev: v0.6.1
+    hooks:
+      - id: skjold
+        args: [-s, pyup, -s, gemnasium, -s, pypa, -s, osv]
+        files: ^requirements\.txt$
+
+  ## All
+  - repo: https://github.com/streetsidesoftware/cspell-cli
+    rev: v6.17.1
+    hooks:
+      - id: cspell
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-case-conflict
+      - id: check-merge-conflict
+        args: [--assume-in-merge]
