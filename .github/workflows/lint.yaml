@@ -1,0 +1,426 @@
+---
+name: Lint
+
+"on":
+  - pull_request
+
+jobs:
+  # YAML
+  prettier-yaml:
+    name: Check YAML files are formatted with Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.{yaml,yml}"
+      - uses: creyD/prettier_action@v4.2
+        with:
+          dry: true
+          prettier_options: >-
+            --check ${{ steps.changed-files.outputs.all_changed_files }}
+          prettier_version: 2.7.1
+        if: steps.changed-files.outputs.all_changed_files != ''
+
+  yamllint:
+    name: Lint YAML files with yamllint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.{yaml,yml}"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install yamllint==1.29.0
+          yamllint --strict ${{ steps.changed-files.outputs.all_changed_files }}
+        if: steps.changed-files.outputs.all_changed_files != ''
+
+  # YAML, JSON
+  check-metaschema:
+    # schema-validator-action fails if there is no $schema, so this is preferred
+    name: Check YAML and JSON files against their schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.{json,jsonc,yaml,yml}"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install pre-commit==2.21.0
+      - run: >-
+          pre-commit run check-metaschema --config
+          .github/pre-commit-ci-config.yaml --files ${{
+          steps.changed-files.outputs.all_changed_files }}
+
+  # TOML
+  check-toml:
+    name: Check TOML syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.toml"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install pre-commit==2.21.0
+      - run: >-
+          pre-commit run check-toml --config .github/pre-commit-ci-config.yaml
+          --files ${{ steps.changed-files.outputs.all_changed_files }}
+
+  # Markdown
+  markdownlint:
+    name: Lint markdown files with markdownlint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.md"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install pre-commit==2.21.0
+      - run: >-
+          pre-commit run markdownlint --config .github/pre-commit-ci-config.yaml
+          --files ${{ steps.changed-files.outputs.all_changed_files }}
+
+  # INI
+  ini-formatted:
+    name: Check ini files are formatted
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.{ini,cfg}"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install pre-commit==2.21.0
+      - run: >-
+          pre-commit run pretty-format-ini --config
+          .github/pre-commit-ci-config.yaml --files ${{
+          steps.changed-files.outputs.all_changed_files }}
+
+  # Python
+  pyupgrade-check:
+    name: Check code complies with pyupgrade
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.py"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install pre-commit==2.21.0
+      - run: >-
+          pre-commit run pyupgrade --config .github/pre-commit-ci-config.yaml
+          --files ${{ steps.changed-files.outputs.all_changed_files }}
+
+  isort-check:
+    name: Check code complies with isort
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.py"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+      - uses: isort/isort-action@v1
+        with:
+          isort-version: 5.11.4
+          requirements-files: requirements.txt
+          sort-paths: ${{ steps.changed-files.outputs.all_changed_files }}
+
+  black-check:
+    name: Check code complies with black formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.py"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install black==22.12.0
+      - run: >-
+          black --config .black.toml --check --diff --color --verbose --fast ${{
+          steps.changed-files.outputs.all_changed_files }}
+        if: steps.changed-files.outputs.all_changed_files != ''
+
+  pylint:
+    name: Lint code with pylint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.py"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install -r requirements.txt
+          python -m pip install pylint==2.15.10
+      - run: >-
+          pylint --persistent=no --verbose --jobs=0 --output-format=colorized
+          --reports=yes ${{ steps.changed-files.outputs.all_changed_files }}
+        if: steps.changed-files.outputs.all_changed_files != ''
+
+  pydocstyle:
+    name: Lint code with pydocstyle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.py"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install pydocstyle==6.2.3
+      - run: >-
+          pydocstyle --verbose --explain ${{
+          steps.changed-files.outputs.all_changed_files }}
+
+  bandit:
+    name: Lint code with bandit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.py"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install bandit==1.7.4
+      - run: >-
+          bandit --ini setup.cfg ${{
+          steps.changed-files.outputs.all_changed_files }}
+        if: steps.changed-files.outputs.all_changed_files != ''
+
+  flake8:
+    name: Lint code with flake8
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.py"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install -r flake8-plugin-requirements.txt
+          python -m pip install flake8==4.0.1
+          flake8 ${{ steps.changed-files.outputs.all_changed_files }}
+
+  pyright:
+    name: Lint code with pyright
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: "**/*.py"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      # pyrightconf.json expects a virtual environment in .venv
+      - run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install -r requirements.txt
+      - uses: jakebailey/pyright-action@v1
+        with:
+          version: 1.1.289
+          project: pyrightconf.json
+          extra-args: ${{ steps.changed-files.outputs.all_changed_files }}
+        if: steps.changed-files.outputs.all_changed_files != ''
+
+  skjold:
+    name: Check dependencies for vulnerabilities with Skjold
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+        with:
+          files: requirements.txt
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install skjold==0.6.1
+          skjold -v audit -s pyup -s gemnasium -s pypa -s osv requirements.txt
+
+  # All
+  trailing-whitespace-check:
+    name: Check there is no trailing whitespace
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install pre-commit==2.21.0
+      - run: >-
+          pre-commit run trailing-whitespace --config
+          .github/pre-commit-ci-config.yaml --files ${{
+          steps.changed-files.outputs.all_changed_files }}
+
+  line-ending-check:
+    name: Check code EOL is LF
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install pre-commit==2.21.0
+      - run: >-
+          pre-commit run mixed-line-ending --config
+          .github/pre-commit-ci-config.yaml --files ${{
+          steps.changed-files.outputs.all_changed_files }}
+
+  cspell:
+    name: Lint with CSpell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: streetsidesoftware/cspell-action@v2
+        with:
+          check_dot_files: "true"
+          config: cspell.config.yaml
+          verbose: true
+
+  check-case-conflict:
+    name: Check for files that could cause conflicts in case-insensitive systems
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install pre-commit==2.21.0
+      - run: >-
+          pre-commit run check-case-conflict --config
+          .github/pre-commit-ci-config.yaml --files ${{
+          steps.changed-files.outputs.all_changed_files }}
+
+  check-merge-conflict-strings:
+    name: Check for files with merge conflict strings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: tj-actions/changed-files@v35
+        id: changed-files
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade wheel
+          python -m pip install pre-commit==2.21.0
+      - run: >-
+          pre-commit run check-merge-conflict --config
+          .github/pre-commit-ci-config.yaml --files ${{
+          steps.changed-files.outputs.all_changed_files }}
