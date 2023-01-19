@@ -7,6 +7,7 @@ flake8==4.0.1
 bandit==1.7.4
 yamllint==1.29.0
 pyright==1.1.289
+pydocstyle==6.2.3
 
 # Formatting
 black==22.12.0
