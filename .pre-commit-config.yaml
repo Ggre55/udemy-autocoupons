@@ -42,14 +42,12 @@ repos:
     hooks:
       - id: black
         args: [--config, .black.toml]
-        exclude: typings
 
   ## All
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
-        exclude: typings
       - id: mixed-line-ending
         args: [--fix=lf]
 

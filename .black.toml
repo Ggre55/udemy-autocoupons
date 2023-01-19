@@ -1,3 +1,2 @@
 [tool.black]
-extend-exclude = "typings"
 line-length = 80
