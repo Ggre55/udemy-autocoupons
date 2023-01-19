@@ -108,7 +108,8 @@ class _UdemyCourse(ABC):
 
         # Avoid using regex
         has_course_url_id = (
-            path.startswith("/course/") and len(path) > 8  # len('/course/') == 8
+            path.startswith("/course/")
+            and len(path) > 8  # len('/course/') == 8
         )
 
         return is_udemy and has_course_url_id

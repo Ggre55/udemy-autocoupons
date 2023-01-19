@@ -203,7 +203,9 @@ class UdemyDriver:
             The state of the course.
 
         """
-        price_selector = '[data-purpose*="course-price-text"] span:not(.ud-sr-only)'
+        price_selector = (
+            '[data-purpose*="course-price-text"] span:not(.ud-sr-only)'
+        )
 
         self._wait.until(
             EC.any_of(
@@ -231,7 +233,10 @@ class UdemyDriver:
 
         # Sometimes the element renders before its text
         price_text: str = self._wait.until(
-            lambda driver: driver.find_element(By.CSS_SELECTOR, price_selector).text,
+            lambda driver: driver.find_element(
+                By.CSS_SELECTOR,
+                price_selector,
+            ).text,
         )
 
         _debug.debug("price_text is %s", price_text)
@@ -271,7 +276,11 @@ class UdemyDriver:
 
         _debug.debug("Total amount text is %s", total_amount_text)
 
-        return State.ENROLLABLE if total_amount_text.startswith("0") else State.PAID
+        return (
+            State.ENROLLABLE
+            if total_amount_text.startswith("0")
+            else State.PAID
+        )
 
     def _wait_for(self, css_selector: str) -> WebElement:
         """Waits until the element with the given CSS selector is located.

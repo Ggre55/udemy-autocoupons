@@ -42,7 +42,9 @@ class QueueManager:
         self,
     ) -> tuple[
         AsyncQueue[str | None],
-        MpQueue[CourseWithCoupon | None],  # pylint: disable=unsubscriptable-object
+        MpQueue[  # pylint: disable=unsubscriptable-object
+            CourseWithCoupon | None
+        ],
     ]:
         """Gets the queues.
 
