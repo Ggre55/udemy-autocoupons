@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup, ResultSet, Tag
 from udemy_autocoupons.constants import SCRAPER_WAIT
 from udemy_autocoupons.request_with_reattempts import request_with_reattempts
 from udemy_autocoupons.scrapers.scraper import Scraper
-from udemy_autocoupons.scrapers.wordpress_scraper import (
+from udemy_autocoupons.scrapers.web_scrappers.wordpress_scraper import (
     WordpressScraper,
     WordpressScraperPersistentData,
 )

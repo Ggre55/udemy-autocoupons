@@ -8,7 +8,7 @@ from typing import TypedDict
 from aiohttp import ClientSession
 
 from udemy_autocoupons.scrapers.scraper import Scraper
-from udemy_autocoupons.scrapers.wordpress_scraper import (
+from udemy_autocoupons.scrapers.web_scrappers.wordpress_scraper import (
     WordpressScraper,
     WordpressScraperPersistentData,
 )

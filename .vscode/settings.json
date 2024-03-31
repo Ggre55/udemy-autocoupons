@@ -26,5 +26,12 @@
     },
     "yaml.schemas": {
         "https://json.schemastore.org/pre-commit-config.json": ".github/pre-commit-ci-config.yaml"
-    }
+    },
+    "editor.inlineSuggest.enabled": true,
+    "editor.quickSuggestions": {
+        "other": "inline",
+        "comments": true,
+        "strings": true
+    },
+    "editor.quickSuggestionsDelay": 100
 }
